@@ -1,4 +1,5 @@
 #!/bin/bash
+BASEDIR=$(readlink -f $(dirname $0))
 set -e
 LDAP_NAME=${LDAP_NAME:-openldap}
 LDAP_VOLUME=${LDAP_VOLUME:-openldap-volume}
@@ -27,9 +28,9 @@ ${LDAP_IMAGE_NAME} \
 "Create OpenLDAP volume."
 
 #Create base.ldif
-sed -e "s/{SLAPD_DN}/${SLAPD_DN}/g" ${BASE_LDIF}.template > ${BASE_LDIF}
-sed -i "s/{ADMIN_UID}/${GERRIT_ADMIN_UID}/g" ${BASE_LDIF}
-sed -i "s/{ADMIN_EMAIL}/${GERRIT_ADMIN_EMAIL}/g" ${BASE_LDIF}
+sed -e "s/{SLAPD_DN}/${SLAPD_DN}/g" ${BASEDIR}/${BASE_LDIF}.template > ${BASEDIR}/${BASE_LDIF}
+sed -i "s/{ADMIN_UID}/${GERRIT_ADMIN_UID}/g" ${BASEDIR}/${BASE_LDIF}
+sed -i "s/{ADMIN_EMAIL}/${GERRIT_ADMIN_EMAIL}/g" ${BASEDIR}/${BASE_LDIF}
 
 #Start openldap
 docker run \
@@ -38,7 +39,7 @@ docker run \
 --volumes-from ${LDAP_VOLUME} \
 -e SLAPD_PASSWORD=${SLAPD_PASSWORD} \
 -e SLAPD_DOMAIN=${SLAPD_DOMAIN} \
--v ./${BASE_LDIF}:/${BASE_LDIF}:ro \
+-v ${BASEDIR}/${BASE_LDIF}:/${BASE_LDIF}:ro \
 -d ${LDAP_IMAGE_NAME}
 
 while [ -z "$(docker logs ${LDAP_NAME} 2>&1 | tail -n 4 | grep 'slapd starting')" ]; do
