@@ -51,6 +51,12 @@ done
 docker exec openldap \
 ldapadd -f /${BASE_LDIF} -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD}
 
+## Setup CI Admin user's password
 docker exec openldap \
 ldappasswd -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD} -s ${CI_ADMIN_PWD} \
 "uid=${CI_ADMIN_UID},ou=accounts,${SLAPD_DN}"
+
+## Test User Account
+docker exec openldap \
+ldappasswd -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD} -s testpass \
+"uid=testuser,ou=accounts,${SLAPD_DN}"

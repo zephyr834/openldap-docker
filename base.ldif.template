@@ -23,9 +23,25 @@ homeDirectory: /home/gerrit
 loginShell: /bin/false
 gidNumber: 10000
 uid: {ADMIN_UID}
-cn: gerrit admin
-displayName: gerrit admin
+cn: ci admin
+displayName: CI Admin
 uidNumber: 10000
-sn: admin
-givenName: gerrit
+sn: Admin
+givenName: CI
 mail: {ADMIN_EMAIL}
+
+dn: uid=testuser,ou=accounts,{SLAPD_DN}
+objectClass: posixAccount
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+homeDirectory: /home/gerrit
+loginShell: /bin/false
+gidNumber: 10001
+uid: testuser
+cn: test user
+displayName: test user
+uidNumber: 10001
+sn: user
+givenName: test
+mail: testuser@example.com
