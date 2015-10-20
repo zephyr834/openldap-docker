@@ -6,9 +6,9 @@ LDAP_VOLUME=${LDAP_VOLUME:-openldap-volume}
 SLAPD_PASSWORD=${SLAPD_PASSWORD:-$1}
 SLAPD_DOMAIN=${SLAPD_DOMAIN:-$2}
 LDAP_IMAGE_NAME=${LDAP_IMAGE_NAME:-openfrontier/openldap}
-GERRIT_ADMIN_UID=${GERRIT_ADMIN_UID:-$3}
-GERRIT_ADMIN_PWD=${GERRIT_ADMIN_PWD:-$4}
-GERRIT_ADMIN_EMAIL=${GERRIT_ADMIN_EMAIL:-$5}
+CI_ADMIN_UID=${CI_ADMIN_UID:-$3}
+CI_ADMIN_PWD=${CI_ADMIN_PWD:-$4}
+CI_ADMIN_EMAIL=${CI_ADMIN_EMAIL:-$5}
 
 BASE_LDIF=base.ldif
 
@@ -29,8 +29,8 @@ ${LDAP_IMAGE_NAME} \
 
 #Create base.ldif
 sed -e "s/{SLAPD_DN}/${SLAPD_DN}/g" ${BASEDIR}/${BASE_LDIF}.template > ${BASEDIR}/${BASE_LDIF}
-sed -i "s/{ADMIN_UID}/${GERRIT_ADMIN_UID}/g" ${BASEDIR}/${BASE_LDIF}
-sed -i "s/{ADMIN_EMAIL}/${GERRIT_ADMIN_EMAIL}/g" ${BASEDIR}/${BASE_LDIF}
+sed -i "s/{ADMIN_UID}/${CI_ADMIN_UID}/g" ${BASEDIR}/${BASE_LDIF}
+sed -i "s/{ADMIN_EMAIL}/${CI_ADMIN_EMAIL}/g" ${BASEDIR}/${BASE_LDIF}
 
 #Start openldap
 docker run \
@@ -52,5 +52,5 @@ docker exec openldap \
 ldapadd -f /${BASE_LDIF} -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD}
 
 docker exec openldap \
-ldappasswd -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD} -s ${GERRIT_ADMIN_PWD} \
-"uid=${GERRIT_ADMIN_UID},ou=accounts,${SLAPD_DN}"
+ldappasswd -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD} -s ${CI_ADMIN_PWD} \
+"uid=${CI_ADMIN_UID},ou=accounts,${SLAPD_DN}"
