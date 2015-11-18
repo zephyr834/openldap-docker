@@ -60,3 +60,8 @@ ldappasswd -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD} -s ${CI_ADMIN_PWD} 
 docker exec openldap \
 ldappasswd -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD} -s testpass \
 "uid=testuser,ou=accounts,${SLAPD_DN}"
+
+# Add testuser to developers group for testing
+echo "Adding testuser to developers group"
+docker cp ${BASEDIR}/add-user-to-dev-group.sh openldap:/ # Copy over modify script since it can't be executed 
+docker exec openldap /add-user-to-dev-group.sh

@@ -8,11 +8,16 @@ objectClass: organizationalUnit
 ou: accounts
 description: All accounts' entries are under this group.
 
-dn: cn=group,ou=accounts,{SLAPD_DN}
+dn: ou=groups,{SLAPD_DN}
+objectClass: organizationalUnit
+ou: groups
+description: All LDAP groups entries are under this group.
+
+dn: cn=developers,ou=groups,{SLAPD_DN}
 objectClass: posixGroup
-cn: group
-description: group
-gidNumber: 10000
+cn: developers
+gidNumber: 1000
+description: All developers will be added to this group
 
 dn: uid={ADMIN_UID},ou=accounts,{SLAPD_DN}
 objectClass: posixAccount
