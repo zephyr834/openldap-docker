@@ -6,9 +6,12 @@ LDAP_VOLUME=${LDAP_VOLUME:-openldap-volume}
 SLAPD_PASSWORD=${SLAPD_PASSWORD:-$1}
 SLAPD_DOMAIN=${SLAPD_DOMAIN:-$2}
 LDAP_IMAGE_NAME=${LDAP_IMAGE_NAME:-openfrontier/openldap}
-GERRIT_ADMIN_UID=${GERRIT_ADMIN_UID:-$3}
-GERRIT_ADMIN_PWD=${GERRIT_ADMIN_PWD:-$4}
-GERRIT_ADMIN_EMAIL=${GERRIT_ADMIN_EMAIL:-$5}
+PHPLDAPADMIN_NAME=${3:-phpldapadmin}
+PHPLDAP_LDAP_HOSTS=${PHPLDAP_LDAP_HOSTS:-openldap}
+PHPLDAP_IMAGE_NAME=${4:-osixia/phpldapadmin}
+GERRIT_ADMIN_UID=${GERRIT_ADMIN_UID:-$5}
+GERRIT_ADMIN_PWD=${GERRIT_ADMIN_PWD:-$6}
+GERRIT_ADMIN_EMAIL=${GERRIT_ADMIN_EMAIL:-$7}
 
 BASE_LDIF=base.ldif
 
@@ -39,8 +42,19 @@ docker run \
 --volumes-from ${LDAP_VOLUME} \
 -e SLAPD_PASSWORD=${SLAPD_PASSWORD} \
 -e SLAPD_DOMAIN=${SLAPD_DOMAIN} \
+-e USE_SSL=false \
 -v ${BASEDIR}/${BASE_LDIF}:/${BASE_LDIF}:ro \
 -d ${LDAP_IMAGE_NAME}
+
+#start Phpldap admin
+docker run \
+--name ${PHPLDAPADMIN_NAME} \
+-p 7443:80 \
+--link ${LDAP_NAME}:openldap \
+-e PHPLDAPADMIN_LDAP_HOSTS=${PHPLDAP_LDAP_HOSTS} \
+-e PHPLDAPADMIN_HTTPS=false \
+-d ${PHPLDAP_IMAGE_NAME}
+
 
 while [ -z "$(docker logs ${LDAP_NAME} 2>&1 | tail -n 4 | grep 'slapd starting')" ]; do
     echo "Waiting openldap ready."
