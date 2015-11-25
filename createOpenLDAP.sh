@@ -12,6 +12,9 @@ PHPLDAP_IMAGE_NAME=${4:-osixia/phpldapadmin}
 GERRIT_ADMIN_UID=${GERRIT_ADMIN_UID:-$5}
 GERRIT_ADMIN_PWD=${GERRIT_ADMIN_PWD:-$6}
 GERRIT_ADMIN_EMAIL=${GERRIT_ADMIN_EMAIL:-$7}
+CI_ADMIN_UID=${CI_ADMIN_UID:-$8}
+CI_ADMIN_PWD=${CI_ADMIN_PWD:-$9}
+CI_ADMIN_EMAIL=${CI_ADMIN_EMAIL:-$10}
 
 BASE_LDIF=base.ldif
 
@@ -32,8 +35,8 @@ ${LDAP_IMAGE_NAME} \
 
 #Create base.ldif
 sed -e "s/{SLAPD_DN}/${SLAPD_DN}/g" ${BASEDIR}/${BASE_LDIF}.template > ${BASEDIR}/${BASE_LDIF}
-sed -i "s/{ADMIN_UID}/${GERRIT_ADMIN_UID}/g" ${BASEDIR}/${BASE_LDIF}
-sed -i "s/{ADMIN_EMAIL}/${GERRIT_ADMIN_EMAIL}/g" ${BASEDIR}/${BASE_LDIF}
+sed -i "s/{ADMIN_UID}/${CI_ADMIN_UID}/g" ${BASEDIR}/${BASE_LDIF}
+sed -i "s/{ADMIN_EMAIL}/${CI_ADMIN_EMAIL}/g" ${BASEDIR}/${BASE_LDIF}
 
 #Start openldap
 docker run \
@@ -65,6 +68,12 @@ done
 docker exec openldap \
 ldapadd -f /${BASE_LDIF} -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD}
 
+## Setup CI Admin user's password
 docker exec openldap \
-ldappasswd -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD} -s ${GERRIT_ADMIN_PWD} \
-"uid=${GERRIT_ADMIN_UID},ou=accounts,${SLAPD_DN}"
+ldappasswd -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD} -s ${CI_ADMIN_PWD} \
+"uid=${CI_ADMIN_UID},ou=accounts,${SLAPD_DN}"
+
+## Test User Account
+docker exec openldap \
+ldappasswd -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD} -s testpass \
+"uid=testuser,ou=accounts,${SLAPD_DN}"
