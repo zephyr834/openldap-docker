@@ -12,6 +12,8 @@ CI_ADMIN_EMAIL=${CI_ADMIN_EMAIL:-$5}
 
 BASE_LDIF=base.ldif
 
+ADD_TO_GROUPS_SCRIPT=add-users-to-initial-groups.sh
+
 #Convert FQDN to LDAP base DN
 SLAPD_TMP_DN=".${SLAPD_DOMAIN}"
 while [ -n "${SLAPD_TMP_DN}" ]; do
@@ -62,6 +64,6 @@ ldappasswd -x -D "cn=admin,${SLAPD_DN}" -w ${SLAPD_PASSWORD} -s testpass \
 "uid=testuser,ou=accounts,${SLAPD_DN}"
 
 # Add testuser to developers group for testing
-echo "Adding testuser to developers group"
-docker cp ${BASEDIR}/add-user-to-dev-group.sh openldap:/ # Copy over modify script since it can't be executed 
-docker exec openldap /add-user-to-dev-group.sh
+echo "Adding users to initial groups"
+docker cp ${BASEDIR}/${ADD_TO_GROUPS_SCRIPT} openldap:/ # Copy over modify script since it can't be executed 
+docker exec openldap /${ADD_TO_GROUPS_SCRIPT}
