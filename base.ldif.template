@@ -13,10 +13,16 @@ objectClass: organizationalUnit
 ou: groups
 description: All LDAP groups entries are under this group.
 
+dn: cn=admin,ou=groups,{SLAPD_DN}
+objectClass: posixGroup
+cn: admin
+gidNumber: 1000
+description: The CI administrator(s) will be added to this group
+
 dn: cn=developers,ou=groups,{SLAPD_DN}
 objectClass: posixGroup
 cn: developers
-gidNumber: 1000
+gidNumber: 1001
 description: All developers will be added to this group
 
 dn: uid={ADMIN_UID},ou=accounts,{SLAPD_DN}
